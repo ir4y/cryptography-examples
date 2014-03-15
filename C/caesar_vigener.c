@@ -8,6 +8,9 @@
 #define FALSE 0
 #define bool unsigned char
 
+#define abort(...) {fprintf(stderr,__VA_ARGS__);exit(-1);}
+
+
 const char *ALPHABET = "abcdefghijklmnopqrstuvwxyz\0";
 const char LEN = 26;
 
@@ -70,8 +73,7 @@ char *get_content(char * file_name){
         fclose(fp);
         return fcontent;
     }else{
-        fprintf(stderr,"Cant open file '%s'\n", file_name);
-        exit(-1);
+        abort("Cant open file '%s'\n", file_name);
     }
 }
 
@@ -105,38 +107,29 @@ int main (int argc, char **argv){
                 else
                     fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
          return 1;
-       default:
-         exit(-1);
+       default: 
+         abort("Unknown option");
        }
 
-    if(!(is_caesar ^ is_vigener)){
-        fprintf(stderr, "You must specify cifer\n");
-        exit(-1);
-    }
+    if(!(is_caesar ^ is_vigener))
+        abort("You must specify cifer\n");
 
-    if (key == NULL){
-        fprintf(stderr, "You must specify key\n");
-        exit(-1);
-    }
-
+    if (key == NULL)
+        abort("You must specify key\n");
 
     content = get_content(file);
 
     if (is_caesar){
         int i_key = atoi(key);
-        if(i_key == 0){
-            fprintf(stderr, "You must specify number");
-            exit(-1);
-        }
+        if(i_key == 0)
+            abort("You must specify number\n");
         caesar(content,i_key);
     } else if(is_vigener){
         int index;
         for(index=0; index < strlen(key); index++)
-            if(!in_alphabet(key[index])){
-                fprintf(stderr, "You must specify key from '%s'",ALPHABET);
-                exit(-1);
-            }
-        
+            if(!in_alphabet(key[index]))
+                abort("You must specify key from '%s'\n",ALPHABET);
+
         vigener(content, key);
     }
 
