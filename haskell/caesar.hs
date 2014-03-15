@@ -27,12 +27,10 @@ die     = exitWith (ExitFailure 1)
 
 parse ["-c", "-k", key, "-f", fs] = do { content <- readFile fs
                                        ; putStr (caesar (read key) content)
-                                       ; exit
                                        }
 parse ["-v", "-k", key, "-f", fs] = do { content <- readFile fs
                                        ; putStr (vigener key content)
-                                       ; exit
                                        }
-parse _                           = usage >> exit
-
-main = getArgs >>= parse
+parse _                           = usage
+ 
+main = getArgs >>= parse >> exit
