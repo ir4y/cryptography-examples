@@ -16,14 +16,13 @@ do_shift shift char
 
 caesar shift msg = map (chr . (do_shift shift) . ord) msg
 
-to_shift key = 1 + ord('a') - key
+to_shift key = key - ord('a') + 1
 
-vigener key msg = map (chr . uncurry do_shift) (zip (map (to_shift . ord) (intercalate "" (repeat key)))
-                                                    (map ord msg))
+vigener key msg = map (chr . uncurry do_shift) $ zip (map (to_shift . ord) $ intercalate "" (repeat key))
+                                                     (map ord msg)
 
 usage   = putStrLn "Usage: encode [-cv] -k key -f file"
 exit    = exitWith ExitSuccess
-die     = exitWith (ExitFailure 1)
 
 encript "-c" key content = caesar (read key) content
 encript "-v" key content = vigener key content
