@@ -28,7 +28,7 @@ bool in_alphabet(char letter){
     return FALSE;
 }
 
-void caesar(char *content, int key){
+void encode(char *content,char * key, char(*do_encode)(char, int, char*)){
     int index=0;
     char letter;
 
@@ -37,24 +37,8 @@ void caesar(char *content, int key){
         if(letter==0x0)
             break;
         if(in_alphabet(letter))
-            content[index] = ((letter - 'a' + key) % LEN) + 'a';
+            content[index] = do_encode(letter, index, key);
         index++;
-    }
-}
-
-void vigener(char *content, char *key){
-    int index=0;
-    char letter;
-    size_t key_size = strlen(key);
-    
-    while(TRUE){
-        letter = content[index];
-        if(letter==0x0)
-            break;
-        if(in_alphabet(letter))
-            content[index] = ((letter - 'a' + key[index % key_size] - 'a' + 1) % LEN) + 'a';
-        index++;
-
     }
 }
 
@@ -67,7 +51,7 @@ char *get_content(char * file_name){
         fseek(fp, 0, SEEK_END);
         size = ftell(fp);
         fseek(fp, 0, SEEK_SET);
-        fcontent = malloc(size+1);
+        fcontent = (char*)malloc(size+2);
         fcontent[size+1] = 0x0;
         fread(fcontent, 1, size, fp);
         fclose(fp);
@@ -120,17 +104,21 @@ int main (int argc, char **argv){
     content = get_content(file);
 
     if (is_caesar){
-        int i_key = atoi(key);
+        char i_key = atoi(key);
         if(i_key == 0)
             abort("You must specify number\n");
-        caesar(content,i_key);
+        encode(content, &i_key,  
+                [] (char letter, int index, char* key) -> char {
+                    return ((letter - 'a' + *key) % LEN) + 'a'; });
     } else if(is_vigener){
         int index;
         for(index=0; index < strlen(key); index++)
             if(!in_alphabet(key[index]))
                 abort("You must specify key from '%s'\n",ALPHABET);
 
-        vigener(content, key);
+        encode(content, key,
+                [] (char letter, int index, char* key) -> char {
+                    return ((letter - 'a' + key[index % strlen(key)] - 'a' + 1) % LEN) + 'a';});
     }
 
     fprintf(stdout,"%s",content);
