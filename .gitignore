@@ -1,1 +1,5 @@
 *.swp
+*.o
+*.hi
+Main
+Test
