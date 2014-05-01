@@ -1,5 +1,8 @@
 *.swp
 *.o
 *.hi
+.hpc/
+*.tix
+*.html
 Main
 Test
