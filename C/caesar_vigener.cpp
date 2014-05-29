@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-//#include <functional>
+#include <functional>
 
 #define TRUE 1
 #define FALSE 0
@@ -30,9 +30,8 @@ bool in_alphabet(char letter)
 
     return FALSE;
 }
-//const std::function<char(char, int)> & do_encode - можно вставить вместо F do_encode, в этом случае нужно будет раскомментировать #include <functional> и убрать template<typename F>
-template<typename F> 
-void encode(char *content, F do_encode)
+
+void encode(char *content, const std::function<char(char, int)> & do_encode)
 {
     int index = 0;
     char letter;
@@ -51,7 +50,7 @@ void encode(char *content, F do_encode)
     }
 }
 
-char *get_content(char * file_name)
+char *get_content(char *file_name)
 {
     FILE *fp;
 
@@ -73,7 +72,7 @@ char *get_content(char * file_name)
         return fcontent;
     }
     else
-		abort("Cant open file '%s'\n", file_name);
+	abort("Cant open file '%s'\n", file_name);
 }
 
 int main (int argc, char **argv)
@@ -110,7 +109,7 @@ int main (int argc, char **argv)
                     fprintf (stderr, "Unknown option character `\\x%x'.\n", optopt);
                 return 1;
             default: 
-				abort("Unknown option");
+		abort("Unknown option");
         }
 
     if(!(is_caesar ^ is_vigener))
@@ -128,9 +127,9 @@ int main (int argc, char **argv)
         if(i_key == 0)
             abort("You must specify number\n");
 	
-		encode(content, 
-			[key] (char letter, int index) -> char //char можно не указывать, так как функция состоит только из одного return
-					{ return ((letter - 'a' + *key) % LEN) + 'a'; });
+	encode(content, 
+		[key] (char letter, int index)
+			{ return ((letter - 'a' + *key) % LEN) + 'a'; });
     }
     else if(is_vigener)
     {
@@ -138,14 +137,14 @@ int main (int argc, char **argv)
 
         for(index = 0; index < strlen(key); index++)
             if(!in_alphabet(key[index]))
-                abort("You must specify key from '%s'\n",ALPHABET);
+                abort("You must specify key from '%s'\n", ALPHABET);
 
         encode(content, 
-			[key] (char letter, int index) -> char //char можно не указывать, так как функция состоит только из одного return
-					{ return ((letter - 'a' + key[index % strlen(key)] - 'a' + 1) % LEN) + 'a'; });
+		[key] (char letter, int index)
+			{ return ((letter - 'a' + key[index % strlen(key)] - 'a' + 1) % LEN) + 'a'; });
     }
 
-    fprintf(stdout,"\n%s\n\n",content);
+    fprintf(stdout, "\n%s\n\n", content);
 
     return 0;
 }
