@@ -128,20 +128,21 @@ int main (int argc, char **argv)
             abort("You must specify number\n");
 	
 	encode(content, 
-		[key] (char letter, int index)
+		[&key] (char letter, int index)
 			{ return ((letter - 'a' + *key) % LEN) + 'a'; });
     }
     else if(is_vigener)
     {
-        int index;
+        int index, key_length;
 
         for(index = 0; index < strlen(key); index++)
             if(!in_alphabet(key[index]))
                 abort("You must specify key from '%s'\n", ALPHABET);
 
+        key_length = strlen(key);
         encode(content, 
-		[key] (char letter, int index)
-			{ return ((letter - 'a' + key[index % strlen(key)] - 'a' + 1) % LEN) + 'a'; });
+          [&key, &key_length] (char letter, int index)
+            { return ((letter - 'a' + key[index % key_length] - 'a' + 1) % LEN) + 'a'; });
     }
 
     fprintf(stdout, "\n%s\n\n", content);
